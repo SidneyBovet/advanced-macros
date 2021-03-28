@@ -1,6 +1,7 @@
 #include <macro_player/keystroke_emulator.hpp>
 #include <macro_player/keystroke_listener.hpp>
 #include <macro_player/settings.hpp>
+#include <macro_player/logging.hpp>
 
 #include <Windows.h>
 
@@ -17,8 +18,12 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
     {
         SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
 
+        macro_player::logging::setup_logging();
+        spdlog::get("global")->debug("Started");
+
         macro_player::settings::Settings settings;
         settings.load_settings();
+        spdlog::get("global")->info("Settings loaded");
 
         // macro_player::keystroke_listener::KeystrokeListener keyListener;
         // keyListener.process_one_message();
@@ -27,7 +32,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
 
         macro_player::actions::KeystrokeSequence keystrokes;
         keystrokes.actions.push_back("KC_LGUI");
-        keystrokes.actions.push_back("KC_D");
+        keystrokes.actions.push_back("KC_R");
         keyEmulator.simulate(keystrokes);
     }
     catch (const std::exception &e)
