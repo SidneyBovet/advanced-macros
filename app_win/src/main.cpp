@@ -7,7 +7,10 @@
 #include <thread>
 #include <chrono>
 
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
+int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
+                   [[maybe_unused]] _In_opt_ HINSTANCE hPrevInstance,
+                   [[maybe_unused]] _In_ LPSTR lpCmdLine,
+                   [[maybe_unused]] _In_ int nShowCmd)
 {
     try
     {

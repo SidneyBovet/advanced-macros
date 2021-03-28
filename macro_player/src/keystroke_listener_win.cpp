@@ -78,9 +78,9 @@ namespace macro_player::keystroke_listener
             else if (ret == -1)
             {
                 // Error
-                std::string message = "Couldn't get message, error: ";
-                message += std::to_string(GetLastError());
-                throw std::runtime_error(message);
+                std::string what = "Couldn't get message, error: ";
+                what += std::to_string(GetLastError());
+                throw std::runtime_error(what);
             }
             else
             {

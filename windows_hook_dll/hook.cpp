@@ -2,9 +2,9 @@
 
 static HWND s_mainWindowsHandle = NULL;
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL,  // handle to DLL module
-                    DWORD fdwReason,     // reason for calling function
-                    LPVOID lpReserved)   // reserved
+BOOL WINAPI DllMain([[maybe_unused]] HINSTANCE hinstDLL,  // handle to DLL module
+                    [[maybe_unused]] DWORD fdwReason,     // reason for calling function
+                    [[maybe_unused]] LPVOID lpReserved)   // reserved
 {
     // Perform actions based on the reason for calling.
     switch (fdwReason)
