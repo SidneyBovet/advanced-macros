@@ -36,3 +36,4 @@ endif()
 
 add_subdirectory(windows_hook_dll)
 add_subdirectory(macro_player)
+add_subdirectory(app_win)

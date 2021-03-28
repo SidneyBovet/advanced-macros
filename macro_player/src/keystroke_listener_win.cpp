@@ -1,13 +1,9 @@
-#include "keystroke_listener.hpp"
+#include "macro_player/keystroke_listener.hpp"
 
 #include <Windows.h>
 
-#include <delayimp.h>
-
 #include <hook.hpp>
 
-#include <atomic>
-#include <iostream>
 #include <stdexcept>
 #include <string>
 
@@ -95,7 +91,7 @@ namespace macro_player::keystroke_listener
         }
     };
 
-    KeystrokeListener::KeystrokeListener() : m_pimpl {std::make_unique<impl>()}
+    KeystrokeListener::KeystrokeListener() : m_pimpl { std::make_unique<impl>() }
     {
     }
 

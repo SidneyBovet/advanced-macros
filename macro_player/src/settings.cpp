@@ -1,4 +1,4 @@
-#include "settings.hpp"
+#include "macro_player/settings.hpp"
 
 #include <nlohmann/json.hpp>
 

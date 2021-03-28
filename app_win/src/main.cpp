@@ -1,5 +1,5 @@
-#include "keystroke_listener.hpp"
-#include "settings.hpp"
+#include <macro_player/keystroke_listener.hpp>
+#include <macro_player/settings.hpp>
 
 #include <Windows.h>
 
