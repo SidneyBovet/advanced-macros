@@ -13,6 +13,8 @@ set(SOURCES
 
 if (MSVC)
     list(APPEND SOURCES
+        src/keycodes_win.hpp
+        src/keycodes_win.cpp
         src/keystroke_emulator_win.cpp
         src/keystroke_listener_win.cpp
         src/process_launcher_win.cpp)

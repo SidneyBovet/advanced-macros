@@ -11,16 +11,22 @@ namespace macro_player::actions
         virtual ~Action() {};
     };
 
+    template <typename T>
+    class Sequence : public Action
+    {
+    public:
+        std::vector<T> actions;
+        uint32_t delayBetweenActions;
+    };
+
     class ProcessLaunch : public Action
     {
+    public:
         std::string commandLine;
     };
 
-    using Keystroke = uint16_t;
+    using Keycode = std::string;
 
-    class KeystrokeSequence : public Action
-    {
-        std::vector<Keystroke> keystrokes;
-        uint32_t delayBetweenStrokes;
-    };
+    using KeystrokeSequence = Sequence<Keycode>;
+    using ActionSequence = Sequence<Action>;
 }

@@ -1,3 +1,4 @@
+#include "keycodes_win.hpp"
 #include "macro_player/keystroke_listener.hpp"
 
 #include <Windows.h>
@@ -55,6 +56,8 @@ namespace macro_player::keystroke_listener
     public:
         impl()
         {
+            KeycodesWindows::prepare_reversed_map();
+
             load_dll();
             install_hook();
         }
