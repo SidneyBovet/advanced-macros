@@ -22,7 +22,8 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
         spdlog::debug("Started");
 
         macro_player::settings::Settings settings;
-        settings.load_settings();
+        std::ifstream settings_file("settings.json");
+        settings.load_settings(settings_file);
 
         // macro_player::keystroke_listener::KeystrokeListener keyListener;
         // keyListener.process_one_message();

@@ -28,10 +28,26 @@ add_library(${TARGET} STATIC ${HEADERS} ${SOURCES})
 target_include_directories(${TARGET} PUBLIC include)
 
 target_link_libraries(${TARGET}
-    PUBLIC nlohmann_json
-    PUBLIC spdlog)
+    PUBLIC spdlog
+    PRIVATE nlohmann_json)
 
 if (MSVC)
     target_link_libraries(${TARGET}
         PRIVATE windows_hook)
 endif()
+
+
+# Unit tests
+add_executable(macro_player_tests
+    tests/settings_tests.cpp)
+
+#target_include_directories(macro_player_tests PRIVATE src)
+
+target_link_libraries(macro_player_tests PRIVATE
+    nlohmann_json
+    macro_player
+    gmock_main
+    gtest_main)
+
+add_test(macro_player_test
+    macro_player_tests)
