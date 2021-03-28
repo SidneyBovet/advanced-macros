@@ -32,6 +32,8 @@ if (nlohmann_json_ADDED)
   target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR})
 endif()
 
+CPMAddPackage("gh:gabime/spdlog@1.8.5")
+
 # Treat warnings as errors
 if (MSVC)
     # warning level 4 and all warnings as errors

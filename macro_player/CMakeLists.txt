@@ -4,6 +4,7 @@ set(HEADERS
     include/macro_player/actions.hpp
     include/macro_player/keystroke_emulator.hpp
     include/macro_player/keystroke_listener.hpp
+    include/macro_player/logging.hpp
     include/macro_player/process_launcher.hpp
     include/macro_player/settings.hpp)
 
@@ -27,7 +28,8 @@ add_library(${TARGET} STATIC ${HEADERS} ${SOURCES})
 target_include_directories(${TARGET} PUBLIC include)
 
 target_link_libraries(${TARGET}
-    PUBLIC nlohmann_json)
+    PUBLIC nlohmann_json
+    PUBLIC spdlog)
 
 if (MSVC)
     target_link_libraries(${TARGET}
