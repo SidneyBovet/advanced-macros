@@ -8,7 +8,7 @@ namespace macro_player::settings
 {
     struct settings
     {
-        std::unordered_map<actions::Keystroke, actions::Action> actions;
+        std::unordered_map<actions::Keycode, actions::Action> actions;
     };
 
     class Settings
