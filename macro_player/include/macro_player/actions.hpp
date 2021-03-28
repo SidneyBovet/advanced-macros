@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace macro_player::actions
 {
@@ -42,5 +43,5 @@ namespace macro_player::actions
     using Keycode = std::string;
 
     using KeystrokeSequence = Sequence<Keycode>;
-    using ActionSequence = Sequence<Action>;
+    using ActionSequence = Sequence<std::shared_ptr<Action>>;
 }

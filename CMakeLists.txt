@@ -5,6 +5,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake")
 
 project(macro_player VERSION 1.0 LANGUAGES CXX)
+cmake_policy(SET CMP0048 NEW)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -34,6 +35,8 @@ endif()
 
 CPMAddPackage("gh:gabime/spdlog@1.8.5")
 
+CPMAddPackage("gh:google/flatbuffers@1.12.0")
+
 # Treat warnings as errors
 if (MSVC)
     # warning level 4 and all warnings as errors
@@ -46,5 +49,6 @@ endif()
 # This is our main app
 
 add_subdirectory(windows_hook_dll)
+add_subdirectory(schema)
 add_subdirectory(macro_player)
 add_subdirectory(app_win)

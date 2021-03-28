@@ -1,0 +1,29 @@
+namespace macro_player.settings.schema;
+
+table Keystrokes {
+    keys:[string];
+    msDelay:uint = 10;
+}
+
+table Launch {
+  command:string;
+}
+
+union ConcreteAction { Keystrokes, Launch, ActionsSequence }
+
+table ActionsSequence {
+    actions:[Action];
+    msDelay:uint = 10;
+}
+
+table Action {
+  trigger: string;
+  action: ConcreteAction;
+}
+
+table Actions {
+  actions:[Action];
+}
+
+file_identifier "MPSF";
+root_type Actions;

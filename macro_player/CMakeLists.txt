@@ -25,10 +25,20 @@ endif()
 
 add_library(${TARGET} STATIC ${HEADERS} ${SOURCES})
 
-target_include_directories(${TARGET} PUBLIC include)
+# Add flatbuffer files
+get_target_property(FLATBUFS_HEADERS schema GENERATED_INCLUDES_DIR)
+#set(FLATBUFS_HEADERS "${FLATBUFS_HEADERS}")
+message("-- Also including ${FLATBUFS_HEADERS}")
+add_dependencies(${TARGET} schema)
+
+target_include_directories(${TARGET}
+    PRIVATE ${FLATBUFS_HEADERS}
+    PUBLIC include)
+
 
 target_link_libraries(${TARGET}
     PUBLIC spdlog
+    PRIVATE flatbuffers
     PRIVATE nlohmann_json)
 
 if (MSVC)
@@ -51,3 +61,14 @@ target_link_libraries(macro_player_tests PRIVATE
 
 add_test(macro_player_test
     macro_player_tests)
+
+set_target_properties(macro_player_tests PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
+
+# TODO: it would be nicer to query 'schema' for its source files
+add_custom_command(TARGET ${TARGET}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_CURRENT_SOURCE_DIR}/../schema/src/actions.fbs
+    "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")

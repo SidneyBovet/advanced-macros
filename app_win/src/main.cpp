@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <fstream>
 #include <thread>
 
 int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
