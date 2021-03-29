@@ -1,4 +1,4 @@
-set(TARGET macro_player_win)
+set(TARGET advanced_macros_win)
 
 set(HEADERS)
 
@@ -17,5 +17,6 @@ target_link_libraries(${TARGET}
 
 # Move binaries to a single location, and tell VS debugger about it
 set_target_properties(${TARGET} PROPERTIES
+    OUTPUT_NAME "advanced-macros"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
