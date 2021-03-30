@@ -49,6 +49,7 @@ endif()
 
 # Unit tests
 add_executable(macro_player_tests
+    tests/listener_emulator_tests.cpp
     tests/settings_tests.cpp)
 
 #target_include_directories(macro_player_tests PRIVATE src)

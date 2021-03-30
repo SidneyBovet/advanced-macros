@@ -6,11 +6,11 @@
 
 #include <WinUser.h>
 
-#include <ranges>
-#include <vector>
-#include <stdexcept>
-#include <sstream>
 #include <cassert>
+#include <ranges>
+#include <sstream>
+#include <stdexcept>
+#include <vector>
 
 namespace macro_player::keystroke_emulator
 {

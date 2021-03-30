@@ -1,5 +1,8 @@
 #pragma once
 
+#include "macro_player/actions.hpp"
+
+#include <functional>
 #include <memory>
 
 namespace macro_player::keystroke_listener
@@ -7,6 +10,8 @@ namespace macro_player::keystroke_listener
     class KeystrokeListener
     {
     public:
+        using keypress_callback = std::function<void(actions::Keycode)>;
+
         KeystrokeListener();
         ~KeystrokeListener();
 
@@ -15,6 +20,7 @@ namespace macro_player::keystroke_listener
         KeystrokeListener(KeystrokeListener &&) = delete;
         KeystrokeListener &operator=(KeystrokeListener &&) = delete;
 
+        void register_key_callback(const keypress_callback &c);
         void process_one_message();
 
     private:
