@@ -1,31 +1,40 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace macro_player::actions
 {
-    // Note: since this comes from JSON, we use camelCase
+    using Keycode = std::string;
 
     class Action
     {
     public:
+        enum class ActionType
+        {
+            UnknownSequence,
+            ProcessLaunch,
+            KeystrokeSequence,
+            ActionSequence
+        };
+
         virtual ~Action() {};
-        virtual const char* get_name() const = 0;
-        // TODO: an action should be able to execute itself?
+        virtual ActionType get_type() const = 0;
+
+        // TODO: should an action be able to execute itself?
     };
 
-    template <typename T>
+    template<typename T>
     class Sequence : public Action
     {
     public:
         std::vector<T> actions;
         uint32_t msBetweenActions = 10;
 
-        const char *get_name() const override
+        ActionType get_type() const override
         {
-            return "Sequence";
+            return ActionType::UnknownSequence;
         }
     };
 
@@ -34,14 +43,27 @@ namespace macro_player::actions
     public:
         std::string commandLine;
 
-        const char *get_name() const override
+        ActionType get_type() const override
         {
-            return "ProcessLaunch";
+            return ActionType::ProcessLaunch;
         }
     };
 
-    using Keycode = std::string;
+    class KeystrokeSequence : public Sequence<Keycode>
+    {
+    public:
+        ActionType get_type() const override
+        {
+            return ActionType::KeystrokeSequence;
+        }
+    };
 
-    using KeystrokeSequence = Sequence<Keycode>;
-    using ActionSequence = Sequence<std::shared_ptr<Action>>;
+    class ActionSequence : public Sequence<std::shared_ptr<Action>>
+    {
+    public:
+        ActionType get_type() const override
+        {
+            return ActionType::ActionSequence;
+        }
+    };
 }

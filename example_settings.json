@@ -1,0 +1,35 @@
+{
+  "actions": [
+    {
+      "trigger": "KC_F16",
+      "action_type": "Launch",
+      "action": {
+        "command": "cmd"
+      }
+    },
+    {
+      "trigger": "KC_F18",
+      "action_type": "ActionsSequence",
+      "action": {
+        "actions": [
+          {
+            "action_type": "Keystrokes",
+            "action": {
+              "keys": [
+                "KC_LGUI",
+                "KC_D"
+              ]
+            }
+          },
+          {
+            "action_type": "Launch",
+            "action": {
+              "command": "winver"
+            }
+          }
+        ],
+        "msDelay": 100
+      }
+    }
+  ]
+}

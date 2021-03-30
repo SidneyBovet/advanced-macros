@@ -165,7 +165,8 @@ namespace macro_player::settings
                     // check for duplicates
                     if (m_actions_map.count(action->trigger()->c_str()) != 0)
                     {
-                        spdlog::warn("We already have an action for {}, skipping additional definition", action->trigger()->c_str());
+                        spdlog::warn("We already have an action for {}, skipping additional definition",
+                                     action->trigger()->c_str());
                         continue;
                     }
 
@@ -228,8 +229,8 @@ namespace macro_player::settings
             actions_sequence_vector.push_back(keystrokes_action);
             actions_sequence_vector.push_back(launch_action);
 
-            auto actions_sequence = schema::CreateActionsSequence(builder,
-                                                                  builder.CreateVector(actions_sequence_vector));
+            auto actions_sequence =
+                schema::CreateActionsSequence(builder, builder.CreateVector(actions_sequence_vector));
 
             auto sequence_trigger = builder.CreateString("KC_F15");
             auto actions_sequence_action = schema::CreateAction(builder,

@@ -1,3 +1,4 @@
+#include <macro_player/actions_executor.hpp>
 #include <macro_player/keystroke_emulator.hpp>
 #include <macro_player/keystroke_listener.hpp>
 #include <macro_player/logging.hpp>
@@ -23,26 +24,22 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
         macro_player::Logging::setup_logging();
         spdlog::debug("Started");
 
-        // testing
-        macro_player::process_launch::ProcessLauncher procLauncher;
-        macro_player::actions::ProcessLaunch command;
-        command.commandLine = "winver";
-        procLauncher.start_process_detached(command);
+        auto settings = std::make_shared<macro_player::settings::Settings>();
+        std::ifstream settingsFile("settings.json");
+        settings->load_settings(settingsFile);
 
-        macro_player::settings::Settings settings;
-        std::ifstream settings_file("settings.json");
-        settings.load_settings(settings_file);
+        macro_player::actions::ActionsExecutor actionsExecutor(settings);
 
-        // macro_player::keystroke_listener::KeystrokeListener keyListener;
-        // keyListener.process_one_message();
+        macro_player::keystroke_listener::KeystrokeListener keyListener;
 
-        macro_player::keystroke_emulator::KeystrokeEmulator keyEmulator;
+        keyListener.register_key_callback([&](auto key) {
+            actionsExecutor.execute_action(key);
+        });
 
-        macro_player::actions::KeystrokeSequence keystrokes;
-        // keystrokes.actions.push_back("KC_LGUI");
-        // keyEmulator.simulate(keystrokes);
-
-        spdlog::debug("Exiting");
+        while (true)
+        {
+            keyListener.process_one_message();
+        }
     }
     catch (const std::exception &e)
     {

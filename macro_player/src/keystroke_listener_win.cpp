@@ -111,11 +111,11 @@ namespace macro_player::keystroke_listener
 #pragma warning(push)
 #pragma warning(disable : 4244)
                 const auto &&qmk_code = KeycodesWindows::win_code_to_keycode(keyboardEvent.vkCode);
+#pragma warning(pop)
                 if (!qmk_code.empty() && m_callback)
                 {
                     m_callback(qmk_code);
                 }
-#pragma warning(pop)
             }
         }
     };

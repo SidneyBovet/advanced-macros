@@ -2,6 +2,7 @@ set(TARGET macro_player)
 
 set(HEADERS
     include/macro_player/actions.hpp
+    include/macro_player/actions_executor.hpp
     include/macro_player/keystroke_emulator.hpp
     include/macro_player/keystroke_listener.hpp
     include/macro_player/logging.hpp
@@ -9,7 +10,7 @@ set(HEADERS
     include/macro_player/settings.hpp)
 
 set(SOURCES
-    src/actions.cpp
+    src/actions_executor.cpp
     src/settings.cpp)
 
 if (MSVC)
