@@ -1,5 +1,6 @@
 #include <macro_player/keystroke_emulator.hpp>
 #include <macro_player/keystroke_listener.hpp>
+#include <macro_player/process_launcher.hpp>
 #include <macro_player/logging.hpp>
 #include <macro_player/settings.hpp>
 
@@ -22,6 +23,12 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
         macro_player::Logging::setup_logging();
         spdlog::debug("Started");
 
+        // testing
+        macro_player::process_launch::ProcessLauncher procLauncher;
+        macro_player::actions::ProcessLaunch command;
+        command.commandLine = "winver";
+        procLauncher.start_process_detached(command);
+
         macro_player::settings::Settings settings;
         std::ifstream settings_file("settings.json");
         settings.load_settings(settings_file);
@@ -32,8 +39,8 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
         macro_player::keystroke_emulator::KeystrokeEmulator keyEmulator;
 
         macro_player::actions::KeystrokeSequence keystrokes;
-        keystrokes.actions.push_back("KC_LGUI");
-        keyEmulator.simulate(keystrokes);
+        //keystrokes.actions.push_back("KC_LGUI");
+        //keyEmulator.simulate(keystrokes);
 
         spdlog::debug("Exiting");
     }
