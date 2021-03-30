@@ -2,22 +2,27 @@
 
 #include "actions.hpp"
 
-#include <unordered_map>
+#include <iostream>
+#include <memory>
 
 namespace macro_player::settings
 {
-    struct settings
-    {
-        std::unordered_map<actions::Keycode, actions::Action> actions;
-    };
-
     class Settings
     {
     public:
-        void load_settings();
-        const settings &get_settings();
+        Settings();
+        ~Settings();
+
+        Settings(const Settings &) = delete;
+        Settings &operator=(const Settings &) = delete;
+        Settings(Settings &&) = delete;
+        Settings &operator=(Settings &&) = delete;
+
+        void load_settings(std::istream &input);
+        const std::shared_ptr<actions::Action> get_action(const actions::Keycode &trigger) const;
 
     private:
-        settings m_settings;
+        class impl;
+        std::unique_ptr<impl> m_pimpl;
     };
 }
