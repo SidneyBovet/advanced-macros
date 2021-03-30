@@ -1,7 +1,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "macro_player/settings.hpp"
 #include "macro_player/actions.hpp"
+#include "macro_player/settings.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -64,7 +64,6 @@ TEST(settings_tests, good_data)
 
     // check that we have the right values
     EXPECT_THAT(sequence->actions, ContainerEq(std::vector<std::string> { "KC_LGUI", "KC_D" }));
-    EXPECT_EQ(sequence->msBetweenActions, 100u);
 }
 
 TEST(settings_tests, missing_trigger)
@@ -155,7 +154,7 @@ TEST(settings_tests, wrong_action_type)
 }
 
 TEST(settings_tests, extra_fields)
-{ // e.g. text comments as fields
+{  // e.g. text comments as fields
     std::string json_content = R"({
   actions: [
     {
@@ -187,7 +186,7 @@ TEST(settings_tests, extra_fields)
 }
 
 TEST(settings_tests, with_json_comments)
-{ // unauthorized by JSON standard, let's see
+{  // unauthorized by JSON standard, let's see
     std::string json_content = R"({
   actions: [
     {
@@ -270,8 +269,7 @@ TEST(settings_tests, action_sequence)
               keys: [
                 "KC_LGUI",
                 "KC_D"
-              ],
-              msDelay: 100
+              ]
             }
           },
           {
@@ -280,7 +278,8 @@ TEST(settings_tests, action_sequence)
               command: "command"
             }
           }
-        ]
+        ],
+        msDelay: 100
       }
     }
   ]
@@ -299,7 +298,7 @@ TEST(settings_tests, action_sequence)
 
     // check that we have the right values
     EXPECT_EQ(sequence->actions.size(), 2);
-    EXPECT_EQ(sequence->msBetweenActions, 10u);
+    EXPECT_EQ(sequence->msBetweenActions, 100u);
 }
 
 TEST(settings_tests, action_sequence_with_missing_action)
@@ -317,8 +316,7 @@ TEST(settings_tests, action_sequence_with_missing_action)
               keys: [
                 "KC_LGUI",
                 "KC_D"
-              ],
-              msDelay: 100
+              ]
             }
           },
           {

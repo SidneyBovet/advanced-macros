@@ -2,7 +2,6 @@ namespace macro_player.settings.schema;
 
 table Keystrokes {
     keys:[string];
-    msDelay:uint = 10;
 }
 
 table Launch {

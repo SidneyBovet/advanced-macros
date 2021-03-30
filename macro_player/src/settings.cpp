@@ -29,8 +29,6 @@ namespace macro_player::settings
             }
 
             auto keystroke_action = std::make_shared<actions::KeystrokeSequence>();
-            auto ms_delay = ks_fb->msDelay();
-            keystroke_action->msBetweenActions = ms_delay;
 
             for (const auto *fb_string : *ks_fb->keys())
             {
@@ -217,7 +215,7 @@ namespace macro_player::settings
             // Win+D on F14
             std::vector<std::string> keycodes { "KC_LGUI", "KC_D" };
             auto keycodes_vector = builder.CreateVectorOfStrings(keycodes);
-            auto keystrokes = schema::CreateKeystrokes(builder, keycodes_vector, 100u);
+            auto keystrokes = schema::CreateKeystrokes(builder, keycodes_vector);
             auto keystrokes_trigger = builder.CreateString("KC_F14");
             auto keystrokes_action = schema::CreateAction(builder,
                                                           keystrokes_trigger,

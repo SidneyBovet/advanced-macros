@@ -38,6 +38,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
 
         while (true)
         {
+            // TODO: add a way to exit the application
             keyListener.process_one_message();
         }
     }

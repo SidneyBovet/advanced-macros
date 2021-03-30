@@ -28,9 +28,6 @@ namespace macro_player::keystroke_emulator
 
         void simulate(const actions::KeystrokeSequence &keystrokes)
         {
-            const size_t total_inputs = keystrokes.actions.size() * 2;
-
-            // OutputDebugString("Sending 'Win-D'\r\n");
             std::vector<INPUT> inputs;
 
             // press each key in order

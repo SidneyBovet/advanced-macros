@@ -30,7 +30,6 @@ namespace macro_player::actions
     {
     public:
         std::vector<T> actions;
-        uint32_t msBetweenActions = 10;
 
         ActionType get_type() const override
         {
@@ -61,6 +60,8 @@ namespace macro_player::actions
     class ActionSequence : public Sequence<std::shared_ptr<Action>>
     {
     public:
+        uint32_t msBetweenActions = 10;
+
         ActionType get_type() const override
         {
             return ActionType::ActionSequence;
