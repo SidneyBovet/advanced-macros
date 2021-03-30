@@ -1,14 +1,14 @@
 #include <macro_player/keystroke_emulator.hpp>
 #include <macro_player/keystroke_listener.hpp>
-#include <macro_player/process_launcher.hpp>
 #include <macro_player/logging.hpp>
+#include <macro_player/process_launcher.hpp>
 #include <macro_player/settings.hpp>
 
 #include <Windows.h>
 
 #include <chrono>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <thread>
 
 int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
@@ -39,8 +39,8 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
         macro_player::keystroke_emulator::KeystrokeEmulator keyEmulator;
 
         macro_player::actions::KeystrokeSequence keystrokes;
-        //keystrokes.actions.push_back("KC_LGUI");
-        //keyEmulator.simulate(keystrokes);
+        // keystrokes.actions.push_back("KC_LGUI");
+        // keyEmulator.simulate(keystrokes);
 
         spdlog::debug("Exiting");
     }

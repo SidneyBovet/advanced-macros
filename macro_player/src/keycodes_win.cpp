@@ -228,7 +228,7 @@ namespace macro_player
     void KeycodesWindows::prepare_reversed_map()
     {
         // Do it only once
-        if (!s_qmk_to_win.empty())
+        if (!s_win_to_qmk.empty())
         {
             return;
         }
