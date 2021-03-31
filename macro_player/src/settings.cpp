@@ -102,12 +102,17 @@ namespace macro_player::settings
                 const auto *as_actions_seq = action->action_as_ActionsSequence();
                 new_action = extract_actions_sequence(as_actions_seq);
             }
+            else if (action_type == schema::ConcreteAction_NONE)
+            {
+                return nullptr;
+            }
             else
             {
                 spdlog::error("Unsupported action type {}", action_type);
+                return nullptr;
             }
 
-            if (new_action != nullptr)
+            if (new_action != nullptr && action->name() != nullptr)
             {
                 new_action->name = action->name()->c_str();
             }
@@ -182,6 +187,10 @@ namespace macro_player::settings
                     if (new_action != nullptr)
                     {
                         m_actions_map[action->trigger()->c_str()] = new_action;
+                    }
+                    else
+                    {
+                        spdlog::warn("'{}' has no valid action, skipping", action->trigger()->c_str());
                     }
                 }
 

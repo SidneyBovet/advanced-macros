@@ -103,7 +103,8 @@ TEST(settings_tests, missing_action)
     std::string json_content = R"({
   actions: [
     {
-      trigger: "KC_F13"
+      trigger: "KC_F13",
+      name: "This does not have an action"
     }
   ]
 })";
@@ -264,6 +265,7 @@ TEST(settings_tests, action_sequence)
       action: {
         actions: [
           {
+            "name": "Return to desktop",
             action_type: "Keystrokes",
             action: {
               keys: [
@@ -299,6 +301,11 @@ TEST(settings_tests, action_sequence)
     // check that we have the right values
     EXPECT_EQ(sequence->actions.size(), 2);
     EXPECT_EQ(sequence->msBetweenActions, 100u);
+
+    // check the first action
+    const auto keypresses = std::dynamic_pointer_cast<macro_player::actions::KeystrokeSequence>(sequence->actions[0]);
+    ASSERT_NE(keypresses, nullptr);
+    EXPECT_EQ(keypresses->name, "Return to desktop");
 }
 
 TEST(settings_tests, action_sequence_with_missing_action)
