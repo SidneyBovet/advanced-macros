@@ -25,12 +25,13 @@ TEST(settings_tests, malformed_data)
     ASSERT_NO_THROW(settings.load_settings(text_content));
 }
 
-TEST(settings_tests, good_data)
+TEST(settings_tests, simple_actions)
 {
     std::string json_content = R"({
   actions: [
     {
       trigger: "KC_F13",
+      name: "Start command",
       action_type: "Launch",
       action: {
         command: "command"
@@ -38,6 +39,7 @@ TEST(settings_tests, good_data)
     },
     {
       trigger: "KC_F14",
+      name: "Return to desktop",
       action_type: "Keystrokes",
       action: {
         keys: [
@@ -63,6 +65,7 @@ TEST(settings_tests, good_data)
 
     // check that we have the right values
     EXPECT_THAT(sequence->actions, ContainerEq(std::vector<std::string> { "KC_LGUI", "KC_D" }));
+    EXPECT_EQ(sequence->name, "Return to desktop");
 }
 
 TEST(settings_tests, missing_trigger)

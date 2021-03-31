@@ -107,6 +107,11 @@ namespace macro_player::settings
                 spdlog::error("Unsupported action type {}", action_type);
             }
 
+            if (new_action != nullptr)
+            {
+                new_action->name = action->name()->c_str();
+            }
+
             return new_action;
         }
 
@@ -206,19 +211,25 @@ namespace macro_player::settings
             flatbuffers::FlatBufferBuilder builder;
 
             // launch command on F13
-            auto command = builder.CreateString("command");
+            auto command = builder.CreateString("winver");
             auto process_launch = schema::CreateLaunch(builder, command);
             auto launch_trigger = builder.CreateString("KC_F13");
-            auto launch_action =
-                schema::CreateAction(builder, launch_trigger, schema::ConcreteAction_Launch, process_launch.Union());
+            auto launch_name = builder.CreateString("Show windows version");
+            auto launch_action = schema::CreateAction(builder,
+                                                      launch_trigger,
+                                                      launch_name,
+                                                      schema::ConcreteAction_Launch,
+                                                      process_launch.Union());
 
             // Win+D on F14
             std::vector<std::string> keycodes { "KC_LGUI", "KC_D" };
             auto keycodes_vector = builder.CreateVectorOfStrings(keycodes);
             auto keystrokes = schema::CreateKeystrokes(builder, keycodes_vector);
             auto keystrokes_trigger = builder.CreateString("KC_F14");
+            auto keystrokes_name = builder.CreateString("Return to desktop");
             auto keystrokes_action = schema::CreateAction(builder,
                                                           keystrokes_trigger,
+                                                          keystrokes_name,
                                                           schema::ConcreteAction_Keystrokes,
                                                           keystrokes.Union());
 
@@ -231,8 +242,10 @@ namespace macro_player::settings
                 schema::CreateActionsSequence(builder, builder.CreateVector(actions_sequence_vector));
 
             auto sequence_trigger = builder.CreateString("KC_F15");
+            auto sequence_name = builder.CreateString("Return to desktop, then show windows version");
             auto actions_sequence_action = schema::CreateAction(builder,
                                                                 sequence_trigger,
+                                                                sequence_name,
                                                                 schema::ConcreteAction_ActionsSequence,
                                                                 actions_sequence.Union());
 
