@@ -23,12 +23,22 @@ namespace macro_player::process_launch
             // Microsoft wants a modifiable char*, let's copy it
             std::vector<char> cmd(command.commandLine.begin(), command.commandLine.end());
             cmd.push_back('\0');
-            spdlog::info("Starting process {}\n", cmd.data());
+            spdlog::info("Starting process {}", cmd.data());
 
+            LPCSTR current_dir = "C:\\";
             DWORD creationFlags = CREATE_DEFAULT_ERROR_MODE | DETACHED_PROCESS;
-            if (!CreateProcess(NULL, cmd.data(), NULL, NULL, TRUE, creationFlags, NULL, NULL, &info, &processInfo))
+            if (!CreateProcess(NULL,
+                               cmd.data(),
+                               NULL,
+                               NULL,
+                               FALSE,
+                               creationFlags,
+                               NULL,
+                               current_dir,
+                               &info,
+                               &processInfo))
             {
-                spdlog::error("CreateProcess failed with error {}\n", GetLastError());
+                spdlog::error("CreateProcess failed with error {}", GetLastError());
                 return;
             }
 
