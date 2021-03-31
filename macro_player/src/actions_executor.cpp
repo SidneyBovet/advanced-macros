@@ -22,7 +22,7 @@ namespace macro_player::actions
             return;
         }
 
-        spdlog::error("Executing action '{}' bound to {}", action->name, keycode);
+        spdlog::info("Executing action '{}' bound to {}", action->name, keycode);
 
         execute_action(action);
     }

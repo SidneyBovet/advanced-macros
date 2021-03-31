@@ -19,6 +19,7 @@ if (MSVC)
         src/keycodes_win.cpp
         src/keystroke_emulator_win.cpp
         src/keystroke_listener_win.cpp
+        src/logging.cpp
         src/process_launcher_win.cpp)
 elseif(UNIX)
     # Add support for other platforms here

@@ -17,10 +17,10 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
                    [[maybe_unused]] _In_ LPSTR lpCmdLine,
                    [[maybe_unused]] _In_ int nShowCmd)
 {
+    SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
+
     try
     {
-        SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
-
         macro_player::Logging::setup_logging();
         spdlog::debug("Started");
 
@@ -35,6 +35,8 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
         keyListener.register_key_callback([&](auto key) {
             actionsExecutor.execute_action(key);
         });
+
+        spdlog::info("Start processing messages...");
 
         while (true)
         {
