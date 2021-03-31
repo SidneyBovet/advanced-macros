@@ -16,8 +16,9 @@ table ActionsSequence {
 }
 
 table Action {
-  trigger: string;
-  action: ConcreteAction;
+  trigger:string;
+  name:string;
+  action:ConcreteAction;
 }
 
 table Actions {

@@ -22,6 +22,8 @@ namespace macro_player::actions
         virtual ~Action() {};
         virtual ActionType get_type() const = 0;
 
+        std::string name;
+
         // TODO: should an action be able to execute itself?
     };
 

@@ -22,6 +22,8 @@ namespace macro_player::actions
             return;
         }
 
+        spdlog::info("Executing action '{}' bound to {}", action->name, keycode);
+
         execute_action(action);
     }
 

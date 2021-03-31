@@ -1,6 +1,7 @@
 
 #include "keycodes_win.hpp"
 #include "macro_player/keystroke_emulator.hpp"
+#include "macro_player/logging.hpp"
 
 #include <Windows.h>
 
@@ -62,9 +63,8 @@ namespace macro_player::keystroke_emulator
 #pragma warning(pop)
             if (uSent != inputs.size())
             {
-                OutputDebugString("SendInput failed\n");
                 const auto error = HRESULT_FROM_WIN32(GetLastError());
-                throw std::runtime_error("SendInput failed with error: " + std::to_string(error));
+                spdlog::error("SendInput failed with error: {}", error);
             }
         }
     };
