@@ -43,8 +43,7 @@ TEST(settings_tests, good_data)
         keys: [
           "KC_LGUI",
           "KC_D"
-        ],
-        msDelay: 100
+        ]
       }
     }
   ]
@@ -83,8 +82,7 @@ TEST(settings_tests, missing_trigger)
         keys: [
           "KC_LGUI",
           "KC_D"
-        ],
-        msDelay: 100
+        ]
       }
     }
   ]
@@ -233,8 +231,7 @@ TEST(settings_tests, trigger_redefinition)
         keys: [
           "KC_LGUI",
           "KC_D"
-        ],
-        msDelay: 100
+        ]
       }
     }
   ]
