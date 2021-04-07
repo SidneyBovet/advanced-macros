@@ -80,6 +80,7 @@ namespace macro_player::keystroke_listener
         void process_one_message()
         {
             MSG message;
+            spdlog::debug("Getting message");
             BOOL ret = GetMessage(&message, m_windowHandle, WM_USER, WM_USER);
             if (ret == 0)
             {
@@ -101,15 +102,18 @@ namespace macro_player::keystroke_listener
                 // process message
                 KBDLLHOOKSTRUCT keyboardEvent = *((KBDLLHOOKSTRUCT *)message.lParam);
 
+                spdlog::debug("Received vkCode {:#x}, scanCode {:#x}", keyboardEvent.vkCode, keyboardEvent.scanCode);
+
                 // translate to qmk and pass to callback
-                if (keyboardEvent.vkCode > 65535)
+                if (keyboardEvent.vkCode >= 65535)
                 {
-                    spdlog::warn("vkCode bigger than 16 bits: {:#X}", keyboardEvent.vkCode);
+                    spdlog::info("vkCode bigger than 16 bits, ignoring", keyboardEvent.vkCode);
                     return;
                 }
 
+
 #pragma warning(push)
-#pragma warning(disable : 4244)
+#pragma warning(disable : 4244) // already checked that vkCode < 65535
                 const auto &&qmk_code = KeycodesWindows::win_code_to_keycode(keyboardEvent.vkCode);
 #pragma warning(pop)
                 if (!qmk_code.empty() && m_callback)

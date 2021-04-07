@@ -7,6 +7,6 @@ namespace macro_player
     class Logging
     {
     public:
-        static void setup_logging();
+        static void setup_logging(spdlog::level::level_enum log_level);
     };
 }
