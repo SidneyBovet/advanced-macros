@@ -8,7 +8,7 @@
 
 namespace macro_player
 {
-    void Logging::setup_logging()
+    void Logging::setup_logging(spdlog::level::level_enum log_level)
     {
         try
         {
@@ -22,7 +22,7 @@ namespace macro_player
             // output to console
             auto console_sink = spdlog::stdout_color_mt("console");
 #endif
-            console_sink->set_level(spdlog::level::trace);
+            console_sink->set_level(log_level);
             console_sink->set_pattern("[%H:%M:%S.%e] [%n] [%l] [thread %t] %v");
 
             // create a file rotating logger with 5mb size max and 3 rotated files
@@ -30,13 +30,13 @@ namespace macro_player
             size_t max_files = 3;
             auto file_sink =
                 std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/logs.txt", max_size, max_files, true);
-            file_sink->set_level(spdlog::level::info);
+            file_sink->set_level(log_level);
             file_sink->set_pattern("[%a %H:%M:%S.%e] [%n] [%l] [%P-%t] %v");
 
             auto logger =
                 std::make_shared<spdlog::logger>("global", spdlog::sinks_init_list({ console_sink, file_sink }));
-            logger->set_level(spdlog::level::debug);
-            logger->flush_on(spdlog::level::err);
+            logger->set_level(log_level);
+            logger->flush_on(spdlog::level::warn);
             spdlog::set_default_logger(logger);
         }
         catch (const std::exception &e)

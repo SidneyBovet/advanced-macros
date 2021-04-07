@@ -37,6 +37,8 @@ CPMAddPackage("gh:gabime/spdlog@1.8.5")
 
 CPMAddPackage("gh:google/flatbuffers@1.12.0")
 
+CPMAddPackage("gh:Taywee/args#6.2.4")
+
 # Treat warnings as errors
 if (MSVC)
     # warning level 4 and all warnings as errors
