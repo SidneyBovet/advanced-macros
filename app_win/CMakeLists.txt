@@ -7,17 +7,15 @@ set(SOURCES
 
 add_executable(${TARGET} ${HEADERS} ${SOURCES})
 
-# Note: most of it is going to be Windows specific anyway, so let's not bother with indirections
-target_link_options(${TARGET} PRIVATE "/SUBSYSTEM:WINDOWS" "/DELAYLOAD:$<TARGET_FILE_NAME:windows_hook>")
-
-
+# Specify that we're going to be a window, and prevent DLL hijacking attacks for some DLLs
+# TODO: use procmon to list all possible hijacking targets
+target_link_options(${TARGET} PRIVATE
+    "/SUBSYSTEM:WINDOWS"
+    "/DELAYLOAD:user32.dll")
 
 target_link_libraries(${TARGET}
-    args
-    macro_player
-    windows_hook
-    nlohmann_json)
-
+    PRIVATE args
+    PRIVATE macro_player)
 
 set_target_properties(${TARGET} PROPERTIES
     OUTPUT_NAME "advanced-macros"                                       # Change the output name, matching the repository name

@@ -17,11 +17,13 @@ namespace macro_player
 
 #if defined(WIN32)
             // output to attached windows debugger
-            auto console_sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
-#else
-            // output to console
-            auto console_sink = spdlog::stdout_color_mt("console");
+            auto msvc_sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
+            msvc_sink->set_level(log_level);
+            msvc_sink->set_pattern("[%H:%M:%S.%e] [%n] [%l] [thread %t] %v");
 #endif
+
+            // output to console
+            auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
             console_sink->set_level(log_level);
             console_sink->set_pattern("[%H:%M:%S.%e] [%n] [%l] [thread %t] %v");
 
@@ -33,8 +35,8 @@ namespace macro_player
             file_sink->set_level(log_level);
             file_sink->set_pattern("[%a %H:%M:%S.%e] [%n] [%l] [%P-%t] %v");
 
-            auto logger =
-                std::make_shared<spdlog::logger>("global", spdlog::sinks_init_list({ console_sink, file_sink }));
+            auto sink_list = spdlog::sinks_init_list({ msvc_sink, console_sink, file_sink });
+            auto logger = std::make_shared<spdlog::logger>("global", sink_list);
             logger->set_level(log_level);
             logger->flush_on(spdlog::level::warn);
             spdlog::set_default_logger(logger);

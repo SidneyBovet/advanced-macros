@@ -37,16 +37,10 @@ target_include_directories(${TARGET}
     PRIVATE ${FLATBUFS_HEADERS}
     PUBLIC include)
 
-
 target_link_libraries(${TARGET}
     PUBLIC spdlog
     PRIVATE flatbuffers
     PRIVATE nlohmann_json)
-
-if (MSVC)
-    target_link_libraries(${TARGET}
-        PRIVATE windows_hook)
-endif()
 
 
 # Unit tests

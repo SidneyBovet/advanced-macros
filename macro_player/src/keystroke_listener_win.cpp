@@ -4,56 +4,70 @@
 
 #include <Windows.h>
 
-#include <hook.hpp>
-
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace macro_player::keystroke_listener
 {
+    LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+    {
+        switch (message)
+        {
+            case WM_CREATE:
+            {
+                // register interest in raw data
+                RAWINPUTDEVICE rid;
+                rid.usUsagePage = 0x01;                          // HID_USAGE_PAGE_GENERIC
+                rid.usUsage = 0x06;                              // HID_USAGE_GENERIC_KEYBOARD
+                rid.dwFlags = RIDEV_NOLEGACY | RIDEV_INPUTSINK;  // receive system wide keystrokes
+                rid.hwndTarget = hWnd;
+
+                if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
+                {
+                    spdlog::error("Failed to register for raw input data: {}", GetLastError());
+                }
+
+                break;
+            }
+            case WM_INPUT:
+            {
+                spdlog::warn("Got an input message from the window procedure");
+                break;
+            }
+            case WM_CLOSE:
+                spdlog::warn("Received close event");
+                PostQuitMessage(0);
+                break;
+            default:
+                return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+
+        return NULL;
+    }
+
     class KeystrokeListener::impl
     {
     private:
-        void load_dll()
-        {
-            m_hinstDLL = LoadLibrary(TEXT("windows_hook.dll"));
-
-            if (m_hinstDLL == 0)
-                throw std::runtime_error("Couldn't load windows hook DLL");
-
-            m_windowHandle = GetActiveWindow();
-            register_callback(m_windowHandle);
-        }
-
-        void free_dll()
-        {
-            FreeLibrary(m_hinstDLL);
-        }
-
         void install_hook()
         {
-            HOOKPROC hkprcSysMsg;
-            hkprcSysMsg = (HOOKPROC)GetProcAddress(m_hinstDLL, "KeyboardProc");
-
-            if (hkprcSysMsg == NULL)
+            // Get our module handle
+            if (!GetModuleHandleEx(NULL, NULL, &m_hinst))
             {
-                std::string message = "Couldn't load hook procedure, error: ";
-                message += std::to_string(GetLastError());
-                throw std::runtime_error(message);
+                spdlog::error("Failed to get module handle: {}", GetLastError());
             }
 
-            m_hhookListener = SetWindowsHookEx(WH_KEYBOARD_LL, hkprcSysMsg, m_hinstDLL, 0);
-        }
-
-        void remove_hook()
-        {
-            UnhookWindowsHookEx(m_hhookListener);
+            // Create the window and register its procedure
+            WNDCLASS wc = { 0 };
+            wc.lpfnWndProc = WndProc;
+            wc.hInstance = m_hinst;
+            wc.lpszClassName = "advanced_macros";
+            RegisterClass(&wc);
+            m_windowHandle = CreateWindow(wc.lpszClassName, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, m_hinst, NULL);
         }
 
         HWND m_windowHandle = NULL;
-        HINSTANCE m_hinstDLL = NULL;
-        HHOOK m_hhookListener = NULL;
+        HINSTANCE m_hinst = NULL;
 
         keypress_callback m_callback;
 
@@ -61,16 +75,10 @@ namespace macro_player::keystroke_listener
         impl()
         {
             KeycodesWindows::prepare_reversed_map();
-
-            load_dll();
             install_hook();
         }
 
-        ~impl()
-        {
-            remove_hook();
-            free_dll();
-        }
+        ~impl() = default;
 
         void register_key_callback(const keypress_callback &c)
         {
@@ -79,47 +87,114 @@ namespace macro_player::keystroke_listener
 
         void process_one_message()
         {
-            MSG message;
             spdlog::debug("Getting message");
-            BOOL ret = GetMessage(&message, m_windowHandle, WM_USER, WM_USER);
+
+            MSG message;
+            BOOL ret = GetMessage(&message, m_windowHandle, WM_INPUT, WM_INPUT);
             if (ret == 0)
             {
                 // WM_QUIT
                 spdlog::warn("Received quit event");
-                UnhookWindowsHookEx(m_hhookListener);
                 exit(0);
             }
-            else if (ret == -1)
+
+            switch (message.message)
             {
-                // Error
-                std::string what = "Couldn't get message, error: ";
-                what += std::to_string(GetLastError());
-                spdlog::error(what);
-                throw std::runtime_error(what);
-            }
-            else
-            {
-                // process message
-                KBDLLHOOKSTRUCT keyboardEvent = *((KBDLLHOOKSTRUCT *)message.lParam);
-
-                spdlog::debug("Received vkCode {:#x}, scanCode {:#x}", keyboardEvent.vkCode, keyboardEvent.scanCode);
-
-                // translate to qmk and pass to callback
-                if (keyboardEvent.vkCode >= 65535)
+                case WM_INPUT:
                 {
-                    spdlog::info("vkCode bigger than 16 bits, ignoring", keyboardEvent.vkCode);
-                    return;
-                }
+                    // Get required buffer size
+                    UINT dwSize = 0;
+                    if (GetRawInputData((HRAWINPUT)message.lParam, RID_INPUT, NULL, &dwSize, sizeof(RAWINPUTHEADER))
+                        == -1)
+                    {
+                        spdlog::error("Error getting input buffer size: {}", GetLastError());
+                        break;
+                    }
 
+                    // Allocate and fill buffer
+                    LPBYTE bytes_buffer = new BYTE[dwSize];
+                    if (bytes_buffer == NULL)
+                    {
+                        spdlog::error("Could not create byte buffer");
+                        break;
+                    }
 
-#pragma warning(push)
-#pragma warning(disable : 4244) // already checked that vkCode < 65535
-                const auto &&qmk_code = KeycodesWindows::win_code_to_keycode(keyboardEvent.vkCode);
-#pragma warning(pop)
-                if (!qmk_code.empty() && m_callback)
-                {
-                    m_callback(qmk_code);
+                    if (GetRawInputData((HRAWINPUT)message.lParam,
+                                        RID_INPUT,
+                                        bytes_buffer,
+                                        &dwSize,
+                                        sizeof(RAWINPUTHEADER))
+                        != dwSize)
+                    {
+                        spdlog::error("Error getting input buffer: {}", GetLastError());
+                        delete[] bytes_buffer;
+                        break;
+                    }
+
+                    // Grab virtual key code from buffer
+                    RAWINPUT *raw = (RAWINPUT *)bytes_buffer;
+                    DWORD type = raw->header.dwType;
+                    RAWKEYBOARD kbd = raw->data.keyboard;
+                    delete[] bytes_buffer;
+
+                    if (type == RIM_TYPEKEYBOARD)
+                    {
+                        // React to key down event only
+                        if (kbd.Message == WM_KEYDOWN || kbd.Message == WM_SYSKEYDOWN)
+                        {
+                            spdlog::debug("Pressed: {:#x} {:#x} {:#x} {:#x}",
+                                          kbd.MakeCode,
+                                          kbd.Flags,
+                                          kbd.VKey,
+                                          kbd.ExtraInformation);
+
+                            // Windows gives us only VK_SHIFT or VK_CONTROL, instead of their LR variant
+                            if (kbd.VKey == VK_SHIFT)
+                            {
+                                // Scan code for right shift key
+                                if (kbd.MakeCode == 0x36)
+                                    kbd.VKey = VK_RSHIFT;
+                                else
+                                    kbd.VKey = VK_LSHIFT;
+                            }
+                            else if (kbd.VKey == VK_CONTROL)
+                            {
+                                // E0 is set for right control
+                                if ((kbd.Flags & RI_KEY_E0) != 0)
+                                    kbd.VKey = VK_RCONTROL;
+                                else
+                                    kbd.VKey = VK_LCONTROL;
+                            }
+                            else if (kbd.VKey == VK_MENU)
+                            {
+                                // E0 is set for right alt
+                                if ((kbd.Flags & RI_KEY_E0) != 0)
+                                    kbd.VKey = VK_RMENU;
+                                else
+                                    kbd.VKey = VK_LMENU;
+                            }
+
+                            // Translate to qmk code and pass to callback
+                            const auto &&qmk_code = KeycodesWindows::win_code_to_keycode(kbd.VKey);
+                            if (qmk_code.empty())
+                            {
+                                spdlog::warn("Received unknown virtual key code {:#x}", kbd.VKey);
+                            }
+                            else if (m_callback)
+                            {
+                                m_callback(qmk_code);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        spdlog::warn("Received a non-keyboard raw input, though we are only subscribed to keyboards");
+                    }
+                    break;
                 }
+                default:
+                    spdlog::warn("Unexpected message type received: {}", message.message);
+                    break;
             }
         }
     };

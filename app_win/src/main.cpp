@@ -43,7 +43,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
     catch (args::Error &e)
     {
         std::ostringstream message;
-        message << e.what() << std::endl << arg_parser;
+        message << e.what() << "\n" << arg_parser;
         MessageBox(NULL, message.str().c_str(), TEXT("Macro Player error"), MB_ICONWARNING);
         return 1;
     }
