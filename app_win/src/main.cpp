@@ -15,12 +15,30 @@
 #include <string>
 #include <thread>
 
+void ensure_single_isntance()
+{
+    const char *mutex_name = "AdvancedMacros";
+    // Try to open the mutex
+    HANDLE hMutex = OpenMutex(MUTEX_ALL_ACCESS, 0, mutex_name);
+
+    if (!hMutex)
+    {
+        // The mutex doesn't exist, this is the first instance, create it
+        hMutex = CreateMutex(0, 0, mutex_name);
+    }
+    else
+    {
+        // The mutex already exists, this is not the first instance
+        throw std::runtime_error("There is already an instance of Advanced Macros running.");
+    }
+}
+
 int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
                    [[maybe_unused]] _In_opt_ HINSTANCE hPrevInstance,
                    [[maybe_unused]] _In_ LPSTR lpCmdLine,
                    [[maybe_unused]] _In_ int nShowCmd)
 {
-    SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
+    SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
 
     // Argument parsing
     args::ArgumentParser arg_parser("Simulate key presses and launch processes on keyboard events.", "");
@@ -31,6 +49,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
                                               "Path to config JSON (defaults to './config.json')",
                                               { 'c', "config" });
 
+    // Parse arguments
     try
     {
         arg_parser.ParseCLI(__argc, __argv);
@@ -48,25 +67,25 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
         return 1;
     }
 
-    spdlog::level::level_enum log_level = spdlog::level::info;
-    if (arg_verbose)
-    {
-        log_level = spdlog::level::debug;
-    }
-
-    std::string settings_file = "config.json";
-    if (arg_settings)
-    {
-        settings_file = args::get(arg_settings);
-    }
-
     // Set up and run
     try
     {
+        ensure_single_isntance();
+
+        spdlog::level::level_enum log_level = spdlog::level::info;
+        if (arg_verbose)
+        {
+            log_level = spdlog::level::debug;
+        }
         macro_player::Logging::setup_logging(log_level);
         spdlog::debug("Started");
 
         auto settings = std::make_shared<macro_player::settings::Settings>();
+        std::string settings_file = "config.json";
+        if (arg_settings)
+        {
+            settings_file = args::get(arg_settings);
+        }
         std::ifstream settingsFile(settings_file);
         settings->load_settings(settingsFile);
 
@@ -90,6 +109,7 @@ int WINAPI WinMain([[maybe_unused]] _In_ HINSTANCE hInstance,
     catch (const std::exception &e)
     {
         MessageBox(NULL, e.what(), TEXT("Macro Player error"), MB_ICONERROR);
+        return GetLastError();
     }
 
     return 0;
