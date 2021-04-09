@@ -48,9 +48,7 @@ else()
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
-# This is our main app
-
-add_subdirectory(windows_hook_dll)
+# Add subdirectories
 add_subdirectory(schema)
 add_subdirectory(macro_player)
 add_subdirectory(app_win)

@@ -18,6 +18,34 @@ namespace macro_player::keystroke_emulator
     class KeystrokeEmulator::impl
     {
     private:
+        void set_input(INPUT &i, actions::Keycode kycode)
+        {
+            i.ki.wVk = KeycodesWindows::keycode_to_win_code(kycode);
+
+            // We also need scan code and flags for L/R shift, alt, control
+            switch (i.ki.wVk)
+            {
+                case VK_LSHIFT:
+                    i.ki.wScan = 0x2a;
+                    break;
+                case VK_RSHIFT:
+                    i.ki.wScan = 0x36;
+                    break;
+                case VK_LCONTROL:
+                    break;
+                case VK_RCONTROL:
+                    i.ki.dwFlags |= RI_KEY_E0;
+                    break;
+                case VK_LMENU:
+                    break;
+                case VK_RMENU:
+                    i.ki.dwFlags |= RI_KEY_E0;
+                    break;
+                default:
+                    break;
+            }
+        }
+
     public:
         impl()
         {
@@ -38,7 +66,7 @@ namespace macro_player::keystroke_emulator
                 ZeroMemory(&i, sizeof(INPUT));
                 i.type = INPUT_KEYBOARD;
 
-                i.ki.wVk = KeycodesWindows::keycode_to_win_code(keystroke);
+                set_input(i, keystroke);
 
                 inputs.push_back(i);
             }
@@ -50,7 +78,8 @@ namespace macro_player::keystroke_emulator
                 ZeroMemory(&i, sizeof(INPUT));
                 i.type = INPUT_KEYBOARD;
 
-                i.ki.wVk = KeycodesWindows::keycode_to_win_code(*it);
+                set_input(i, *it);
+
                 i.ki.dwFlags = KEYEVENTF_KEYUP;
 
                 inputs.push_back(i);
