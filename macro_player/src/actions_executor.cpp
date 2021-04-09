@@ -35,14 +35,32 @@ namespace macro_player::actions
         {
             case Action::ActionType::KeystrokeSequence:
             {
-                KeystrokeSequence *ks_action = dynamic_cast<KeystrokeSequence *>(action.get());
+                auto ks_action = std::dynamic_pointer_cast<KeystrokeSequence>(action);
                 assert(ks_action != nullptr);
+
+                // Sanitize the keystroke sequence, if we simulate something that has an action in the settings we risk
+                // an infinite loop
+                for (auto it = ks_action->actions.begin(); it != ks_action->actions.end();)
+                {
+                    if (m_settings->get_action(*it) != nullptr)
+                    {
+                        spdlog::warn(
+                            "There is an action bound to {}, skipping that input simulation to avoid infinite loops",
+                            *it);
+                        it = ks_action->actions.erase(it);
+                    }
+                    else
+                    {
+                        it++;
+                    }
+                }
+
                 m_emulator.simulate(*ks_action);
                 break;
             }
             case Action::ActionType::ProcessLaunch:
             {
-                ProcessLaunch *pl_action = dynamic_cast<ProcessLaunch *>(action.get());
+                auto pl_action = std::dynamic_pointer_cast<ProcessLaunch>(action);
                 assert(pl_action != nullptr);
                 m_launcher.start_process_detached(*pl_action);
                 break;

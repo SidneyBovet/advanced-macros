@@ -18,7 +18,6 @@ namespace macro_player::settings
     private:
         std::unordered_map<actions::Keycode, std::shared_ptr<actions::Action>> m_actions_map;
 
-    public:
         std::shared_ptr<actions::KeystrokeSequence> extract_kb_sequence(const schema::Keystrokes *ks_fb)
         {
             assert(ks_fb != nullptr);
@@ -120,6 +119,81 @@ namespace macro_player::settings
             return new_action;
         }
 
+        // Generates and logs a sample setting json
+        // To be hones this was more for development, when testing flatbuffers
+        void propose_empty_settings()
+        {
+            flatbuffers::FlatBufferBuilder builder;
+
+            // launch command on F13
+            auto command = builder.CreateString("winver");
+            auto process_launch = schema::CreateLaunch(builder, command);
+            auto launch_trigger = builder.CreateString("KC_F13");
+            auto launch_name = builder.CreateString("Show windows version");
+            auto launch_action = schema::CreateAction(builder,
+                                                      launch_trigger,
+                                                      launch_name,
+                                                      schema::ConcreteAction_Launch,
+                                                      process_launch.Union());
+
+            // Win+D on F14
+            std::vector<std::string> keycodes { "KC_LGUI", "KC_D" };
+            auto keycodes_vector = builder.CreateVectorOfStrings(keycodes);
+            auto keystrokes = schema::CreateKeystrokes(builder, keycodes_vector);
+            auto keystrokes_trigger = builder.CreateString("KC_F14");
+            auto keystrokes_name = builder.CreateString("Return to desktop");
+            auto keystrokes_action = schema::CreateAction(builder,
+                                                          keystrokes_trigger,
+                                                          keystrokes_name,
+                                                          schema::ConcreteAction_Keystrokes,
+                                                          keystrokes.Union());
+
+            // Sequence of the two before on F15
+            std::vector<flatbuffers::Offset<schema::Action>> actions_sequence_vector;
+            actions_sequence_vector.push_back(keystrokes_action);
+            actions_sequence_vector.push_back(launch_action);
+
+            auto actions_sequence =
+                schema::CreateActionsSequence(builder, builder.CreateVector(actions_sequence_vector));
+
+            auto sequence_trigger = builder.CreateString("KC_F15");
+            auto sequence_name = builder.CreateString("Return to desktop, then show windows version");
+            auto actions_sequence_action = schema::CreateAction(builder,
+                                                                sequence_trigger,
+                                                                sequence_name,
+                                                                schema::ConcreteAction_ActionsSequence,
+                                                                actions_sequence.Union());
+
+            // Put all actions together in a vector, and create the root Actions table
+            std::vector<flatbuffers::Offset<schema::Action>> actions_std_vec;
+            actions_std_vec.push_back(launch_action);
+            actions_std_vec.push_back(keystrokes_action);
+            actions_std_vec.push_back(actions_sequence_action);
+            auto actions_vector = builder.CreateVector(actions_std_vec);
+            auto actions = schema::CreateActions(builder, actions_vector);
+            builder.Finish(actions);
+
+            // Parse the schema and generate JSON
+            flatbuffers::Parser parser;
+            std::string schemafile;
+            flatbuffers::LoadFile("actions.fbs", false, &schemafile);
+            if (!parser.Parse(schemafile.c_str()))
+            {
+                spdlog::error("Couldn't read schema file: {}", parser.error_);
+                return;
+            }
+
+            std::string jsongen;
+            if (!GenerateText(parser, builder.GetBufferPointer(), &jsongen))
+            {
+                spdlog::error("Couldn't serialize data to JSON: {}", parser.error_);
+                return;
+            }
+
+            spdlog::info("Settings not found, you may use this as a template:\n{}", jsongen);
+        }
+
+    public:
         void load_settings(std::istream &input)
         {
             spdlog::debug("Loading settings");
@@ -211,80 +285,6 @@ namespace macro_player::settings
             }
 
             return found->second;
-        }
-
-        // Generates and logs a sample setting json
-        // To be hones this was more for development, when testing flatbuffers
-        void propose_empty_settings()
-        {
-            flatbuffers::FlatBufferBuilder builder;
-
-            // launch command on F13
-            auto command = builder.CreateString("winver");
-            auto process_launch = schema::CreateLaunch(builder, command);
-            auto launch_trigger = builder.CreateString("KC_F13");
-            auto launch_name = builder.CreateString("Show windows version");
-            auto launch_action = schema::CreateAction(builder,
-                                                      launch_trigger,
-                                                      launch_name,
-                                                      schema::ConcreteAction_Launch,
-                                                      process_launch.Union());
-
-            // Win+D on F14
-            std::vector<std::string> keycodes { "KC_LGUI", "KC_D" };
-            auto keycodes_vector = builder.CreateVectorOfStrings(keycodes);
-            auto keystrokes = schema::CreateKeystrokes(builder, keycodes_vector);
-            auto keystrokes_trigger = builder.CreateString("KC_F14");
-            auto keystrokes_name = builder.CreateString("Return to desktop");
-            auto keystrokes_action = schema::CreateAction(builder,
-                                                          keystrokes_trigger,
-                                                          keystrokes_name,
-                                                          schema::ConcreteAction_Keystrokes,
-                                                          keystrokes.Union());
-
-            // Sequence of the two before on F15
-            std::vector<flatbuffers::Offset<schema::Action>> actions_sequence_vector;
-            actions_sequence_vector.push_back(keystrokes_action);
-            actions_sequence_vector.push_back(launch_action);
-
-            auto actions_sequence =
-                schema::CreateActionsSequence(builder, builder.CreateVector(actions_sequence_vector));
-
-            auto sequence_trigger = builder.CreateString("KC_F15");
-            auto sequence_name = builder.CreateString("Return to desktop, then show windows version");
-            auto actions_sequence_action = schema::CreateAction(builder,
-                                                                sequence_trigger,
-                                                                sequence_name,
-                                                                schema::ConcreteAction_ActionsSequence,
-                                                                actions_sequence.Union());
-
-            // Put all actions together in a vector, and create the root Actions table
-            std::vector<flatbuffers::Offset<schema::Action>> actions_std_vec;
-            actions_std_vec.push_back(launch_action);
-            actions_std_vec.push_back(keystrokes_action);
-            actions_std_vec.push_back(actions_sequence_action);
-            auto actions_vector = builder.CreateVector(actions_std_vec);
-            auto actions = schema::CreateActions(builder, actions_vector);
-            builder.Finish(actions);
-
-            // Parse the schema and generate JSON
-            flatbuffers::Parser parser;
-            std::string schemafile;
-            flatbuffers::LoadFile("actions.fbs", false, &schemafile);
-            if (!parser.Parse(schemafile.c_str()))
-            {
-                spdlog::error("Couldn't read schema file: {}", parser.error_);
-                return;
-            }
-
-            std::string jsongen;
-            if (!GenerateText(parser, builder.GetBufferPointer(), &jsongen))
-            {
-                spdlog::error("Couldn't serialize data to JSON: {}", parser.error_);
-                return;
-            }
-
-            spdlog::info("Settings not found, you may use this as a template:\n{}", jsongen);
         }
     };
 
