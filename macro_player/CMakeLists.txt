@@ -39,8 +39,7 @@ target_include_directories(${TARGET}
 
 target_link_libraries(${TARGET}
     PUBLIC spdlog
-    PRIVATE flatbuffers
-    PRIVATE nlohmann_json)
+    PRIVATE flatbuffers)
 
 
 # Unit tests
