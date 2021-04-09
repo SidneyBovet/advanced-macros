@@ -8,10 +8,10 @@ set(SOURCES
 add_executable(${TARGET} ${HEADERS} ${SOURCES})
 
 # Specify that we're going to be a window, and prevent DLL hijacking attacks for some DLLs
-# TODO: use procmon to list all possible hijacking targets
 target_link_options(${TARGET} PRIVATE
     "/SUBSYSTEM:WINDOWS"
-    "/DELAYLOAD:user32.dll")
+    "/DELAYLOAD:VCRUNTIME140.dll"
+    "/DELAYLOAD:VCRUNTIME140_1.dll")
 
 target_link_libraries(${TARGET}
     PRIVATE args

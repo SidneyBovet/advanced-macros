@@ -5,8 +5,6 @@
 #include "flatbuffers/util.h"
 #include "macro_player/logging.hpp"
 
-#include <nlohmann/json.hpp>
-
 #include <fstream>
 #include <stdexcept>
 #include <unordered_map>
@@ -270,7 +268,7 @@ namespace macro_player::settings
 
                 spdlog::info("Settings loaded");
             }
-            catch (const nlohmann::json::exception &e)
+            catch (const std::exception &e)
             {
                 spdlog::error("Error reading settings: {}", e.what());
             }
