@@ -9,9 +9,7 @@ add_executable(${TARGET} ${HEADERS} ${SOURCES})
 
 # Specify that we're going to be a window, and prevent DLL hijacking attacks for some DLLs
 target_link_options(${TARGET} PRIVATE
-    "/SUBSYSTEM:WINDOWS"
-    "/DELAYLOAD:VCRUNTIME140.dll"
-    "/DELAYLOAD:VCRUNTIME140_1.dll")
+    "/SUBSYSTEM:WINDOWS")
 
 target_link_libraries(${TARGET}
     PRIVATE args
